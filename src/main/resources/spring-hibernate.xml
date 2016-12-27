@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+	http://www.springframework.org/schema/aop 
+	http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
+	<!-- 使用C3P0数据源，MySQL数据库 -->
+	<!-- <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		MySQL5
+		<property name="driverClass" value="${driverClassName}"></property>
+		<property name="jdbcUrl" value="${url}"></property>
+		<property name="user" value="${username}"></property>
+		<property name="password" value="${password}"></property>
+		<property name="maxPoolSize" value="40"></property>
+		<property name="minPoolSize" value="1"></property>
+		<property name="initialPoolSize" value="1"></property>
+		<property name="maxIdleTime" value="20"></property>
+	</bean> -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close"
+		p:driverClass="com.mysql.jdbc.Driver"
+		p:jdbcUrl="jdbc:mysql://localhost:3306/yijiu"
+		p:user="root"
+		p:password=""
+		p:maxPoolSize="200"
+		p:minPoolSize="2"
+		p:initialPoolSize="2"
+		p:maxIdleTime="20"/>
+
+	<!-- session工厂 -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
+			</props>
+		</property>
+
+		<!-- 注解方式配置 -->
+		<property name="mappingResources">
+			<list>
+				<!-- 以下用来列出Hibernate的持久化类 -->
+				<value>cn/edu/hbtcm/jwc/model/Acupoint.hbm.xml</value>
+				<value>cn/edu/hbtcm/jwc/model/Meridian.hbm.xml</value>
+				<value>cn/edu/hbtcm/jwc/model/Wmdisease.hbm.xml</value>
+				<value>cn/edu/hbtcm/jwc/model/Record.hbm.xml</value>
+				<value>cn/edu/hbtcm/jwc/model/OuRegister.hbm.xml</value>
+				<value>cn/edu/hbtcm/jwc/model/Bodypart.hbm.xml</value>
+				<value>cn/edu/hbtcm/jwc/model/Patient.hbm.xml</value>
+				<value>cn/edu/hbtcm/jwc/model/Tcmdisease.hbm.xml</value>
+				<value>cn/edu/hbtcm/jwc/model/Doctor.hbm.xml</value>
+				<value>cn/edu/hbtcm/jwc/model/Manager.hbm.xml</value>
+				<!-- <value>cn.edu.hbtcm.jwc/model.Meridian_acupoint</value> -->
+			</list>
+		</property>
+		<!-- packagesToScan简化配置 ，用于该包下全部持久化类 -->
+		<!-- <property name="packagesToScan">
+			<list>
+				<value>cn.edu.hbtcm.jwc.model</value>
+			</list>
+		</property> -->
+	</bean>
+	<!-- 配置DAO组件的模板 -->
+<bean id="daoTemplate" abstract="true" lazy-init="true"
+	p:sessionFactory-ref="sessionFactory"/>
+
+<bean id="acupointDao"
+	class="cn.edu.hbtcm.jwc.dao.impl.AcupointDaoHibernate4"
+	parent="daoTemplate"/>
+
+<bean id="bodypartDao"
+	class="cn.edu.hbtcm.jwc.dao.impl.BodypartDaoHibernate4"
+	parent="daoTemplate"/>
+
+<bean id="doctorDao"
+	class="cn.edu.hbtcm.jwc.dao.impl.DoctorDaoHibernate4"
+	parent="daoTemplate"/>
+
+<bean id="managerDao"
+	class="cn.edu.hbtcm.jwc.dao.impl.ManagerDaoHibernate4"
+	parent="daoTemplate"/>
+
+<!-- <bean id="meridian_acupointDao"
+	class="cn.edu.hbtcm.jwc.dao.impl.Meridian_acupointDaoHibernate4"
+	parent="daoTemplate"/> -->
+
+<bean id="meridianDao"
+	class="cn.edu.hbtcm.jwc.dao.impl.MeridianDaoHibernate4"
+	parent="daoTemplate"/>
+
+<bean id="ou_registerDao"
+	class="cn.edu.hbtcm.jwc.dao.impl.Ou_registerDaoHibernate4"
+	parent="daoTemplate"/>
+<bean id="patientDao"
+	class="cn.edu.hbtcm.jwc.dao.impl.PatientDaoHibernate4"
+	parent="daoTemplate"/>
+<bean id="recordDao"
+	class="cn.edu.hbtcm.jwc.dao.impl.RecordDaoHibernate4"
+	parent="daoTemplate"/>
+<bean id="tcmdiseaseDao"
+	class="cn.edu.hbtcm.jwc.dao.impl.TcmdiseaseDaoHibernate4"
+	parent="daoTemplate"/>
+<bean id="wmdiseaseDao"
+	class="cn.edu.hbtcm.jwc.dao.impl.WmdiseaseDaoHibernate4"
+	parent="daoTemplate"/>
+	
+
+</beans>

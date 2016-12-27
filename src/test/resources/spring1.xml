@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+	http://www.springframework.org/schema/aop 
+	http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+	<!-- 引入属性文件Hibernate属性配置 -->
+	<context:property-placeholder location="classpath:database1.properties" />
+
+	<bean id="managerTemplate" abstract="true" lazy-init="true"
+		p:acupointDao-ref="acupointDao"
+		p:bodypartDao-ref="bodypartDao"
+		p:doctorDao-ref="doctorDao"
+		p:managerDao-ref="managerDao"
+		p:meridianDao-ref="meridianDao"
+		p:ou_registerDao-ref="ou_registerDao"
+		p:patientDao-ref="patientDao"
+		p:recordDao-ref="recordDao"
+		p:tcmdiseaseDao-ref="tcmdiseaseDao"
+		p:wmdiseaseDao-ref="wmdiseaseDao"/>
+<!-- p:meridian_acupointDao-ref="meridian_acupointDao" -->
+	<!-- 定义两个业务逻辑组件，继承业务逻辑组件的模板 -->
+	<bean id="docManager"
+		class="cn.edu.hbtcm.jwc.service.impl.DocManagerImpl"
+		parent="managerTemplate"/>
+	<bean id="mgrManager"
+		class="cn.edu.hbtcm.jwc.service.impl.MgrManagerImpl"
+		parent="managerTemplate"/>
+  <!-- 需要再前面用注解@Transactional 
+	<tx:annotation-driven transaction-manager="txManager" />
+	-->
+    
+    <!-- 配置Hibernate的局部事务管理器，使用HibernateTransactionManager类 
+		并注入SessionFactory的引用 -->
+	<!-- <bean id="transactionManager" class=
+		"org.springframework.orm.hibernate4.HibernateTransactionManager"
+		p:sessionFactory-ref="sessionFactory"/> -->
+	<bean id="transactionManager"   class="org.springframework.jdbc.datasource.DataSourceTransactionManager">   
+	 <property name="dataSource" ref="dataSource" />
+	 </bean>	
+	<!-- 配置事务增强处理Bean,指定事务管理器 -->
+	<!-- <tx:advice id="txAdvice" transaction-manager="transactionManager">
+		用于配置详细的事务语义
+		<tx:attributes>
+			所有以'get'开头的方法是read-only的
+			<tx:method name="get*" read-only="true"/>
+			其他方法使用默认的事务设置
+			<tx:method name="*"/>
+		</tx:attributes>
+	</tx:advice>
+	<aop:config>
+		配置一个切入点，匹配docManager和mgrManager
+			两个Bean的所有方法的执行
+		<aop:pointcut id="myPointcut"
+			expression="bean(docManager) or bean(mgrManager)"/>
+		指定在leePointcut切入点应用txAdvice事务增强处理
+		<aop:advisor advice-ref="txAdvice" 
+			pointcut-ref="myPointcut"/>
+	</aop:config> -->
+</beans>
